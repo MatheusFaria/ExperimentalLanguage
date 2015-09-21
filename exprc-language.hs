@@ -1,30 +1,19 @@
-import Data.Maybe
+import System.Environment
+import System.Exit
 
-data ExprC =   NumC Float
-             | TrueC
-             | FalseC
-             | BinOpC Char ExprC ExprC
-             deriving (Show)
+import Interpreter
 
-data ExprV =   NumV Float
-             | BoolV Bool
-             deriving (Show)
+main = getArgs >>= parseInput >>= eval
 
+-- XXX: stub for eval
+eval a = putStr a
 
-sumC :: ExprV -> ExprV -> ExprV
-sumC (NumV a) (NumV b) = (NumV (a + b))
+parseInput ["-h"] = usage   >> exit
+parseInput ["-v"] = version >> exit
+parseInput []     = getContents
+parseInput (h:t)  = readFile h
 
-binops = [('+', sumC)]
-
-getBinop :: Char -> (ExprV -> ExprV -> ExprV)
-getBinop op
-        | isNothing func = error "No symbol found"
-        | isJust func = fromJust(func)
-        where func = lookup op binops
-
-interp :: ExprC -> ExprV
-interp (NumC n) = (NumV n)
-interp (TrueC) = (BoolV True)
-interp (FalseC) = (BoolV False)
-interp (BinOpC op a b) = ((getBinop op) (interp a) (interp b))
-
+usage   = putStrLn "Usage: exprc-language [-vh] [file]"
+version = putStrLn "Experimental Language v0.1"
+exit    = exitWith ExitSuccess
+die     = exitWith (ExitFailure 1)
