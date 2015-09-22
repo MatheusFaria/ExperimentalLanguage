@@ -4,7 +4,7 @@ import System.Environment
 import DataDefinitions
 
 spaces :: Parser ()
-spaces = Parsec.skipMany1 Parsec.space
+spaces = Parsec.skipMany Parsec.space
 
 parseOp :: Parser Char
 parseOp = Parsec.oneOf "+-*/&|"
@@ -16,11 +16,17 @@ parseNum = do
 
 parseBinop :: Parser ExprC
 parseBinop = do
-    a <- parseNum
+    Parsec.oneOf "("
+    a <- parseAll
     op <- parseOp
-    b <- parseNum
+    b <- parseAll
+    Parsec.oneOf ")"
     return (BinOpC op a b)
 
+
+parseAll :: Parser ExprC
+parseAll = try parseBinop
+		<|> parseNum
 
 -- Using:
 -- Parsec.parse parseBinop "[source code]" "300+15"
