@@ -23,13 +23,12 @@ parseFalse = do
 
 parseBinop :: Parser ExprC
 parseBinop = do
-    Parsec.oneOf "("
-    a <- parseAll
-    op <- parseOp
-    b <- parseAll
-    Parsec.oneOf ")"
+    Parsec.oneOf "(" >> spaces
+    a <- spaces >> parseAll
+    op <- spaces >> parseOp
+    b <- spaces >> parseAll
+    spaces >> Parsec.oneOf ")"
     return (BinOpC op a b)
-
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
@@ -42,6 +41,3 @@ mainParse :: String -> ExprC
 mainParse input = case (Parsec.parse parseAll "[source code]" input) of
     Right expr -> expr
     Left err -> error "Invalid Syntax"
-
--- Using:
--- Parsec.parse parseBinop "[source code]" "300+15"
