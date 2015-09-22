@@ -2,8 +2,6 @@ import qualified Text.Parsec as Parsec
 import Text.ParserCombinators.Parsec
 import DataDefinitions
 
-spaces :: Parser ()
-spaces = Parsec.skipMany Parsec.space
 
 parseOp :: Parser Char
 parseOp = Parsec.oneOf "+-*/&|"
@@ -38,6 +36,12 @@ parseAll = try parseNum
         <|> parseTrue
         <|> parseFalse
         <|> parseBinop
+
+
+mainParse :: String -> ExprC
+mainParse input = case (Parsec.parse parseAll "[source code]" input) of
+    Right expr -> expr
+    Left err -> error "Invalid Syntax"
 
 -- Using:
 -- Parsec.parse parseBinop "[source code]" "300+15"
