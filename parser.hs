@@ -1,6 +1,5 @@
 import qualified Text.Parsec as Parsec
-import Text.ParserCombinators.Parsec hiding (spaces)
-import System.Environment
+import Text.ParserCombinators.Parsec
 import DataDefinitions
 
 spaces :: Parser ()
@@ -14,6 +13,16 @@ parseNum = do
     a <- (Parsec.many1 Parsec.digit)
     return (NumC (read a :: Float))
 
+parseTrue :: Parser ExprC
+parseTrue = do
+    Parsec.string "true"
+    return (TrueC)
+
+parseFalse :: Parser ExprC
+parseFalse = do
+    Parsec.string "false"
+    return (FalseC)
+
 parseBinop :: Parser ExprC
 parseBinop = do
     Parsec.oneOf "("
@@ -25,8 +34,10 @@ parseBinop = do
 
 
 parseAll :: Parser ExprC
-parseAll = try parseBinop
-		<|> parseNum
+parseAll = try parseNum
+        <|> parseTrue
+        <|> parseFalse
+        <|> parseBinop
 
 -- Using:
 -- Parsec.parse parseBinop "[source code]" "300+15"
