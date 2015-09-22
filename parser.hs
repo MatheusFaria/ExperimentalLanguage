@@ -26,17 +26,28 @@ parseFalse = do
 parseBinop :: Parser ExprC
 parseBinop = do
     Parsec.oneOf "(" >> spaces
-    a <- spaces >> parseAll
+    left <- parseAll
     op <- spaces >> parseOp
-    b <- spaces >> parseAll
+    right <- spaces >> parseAll
     spaces >> Parsec.oneOf ")"
-    return (BinOpC op a b)
+    return (BinOpC op left right)
+
+parseIf :: Parser ExprC
+parseIf = do
+    Parsec.oneOf "(" >> spaces
+    Parsec.string "if" >> spaces
+    cond <- parseAll
+    ifTrue <- spaces >> parseAll
+    ifFalse <- spaces >> parseAll
+    spaces >> Parsec.oneOf ")"
+    return (IfC cond ifTrue ifFalse)
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
         <|> parseTrue
         <|> parseFalse
-        <|> parseBinop
+        <|> try parseBinop
+        <|> try parseIf
 
 
 mainParse :: String -> ExprC
