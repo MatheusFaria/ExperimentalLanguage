@@ -2,8 +2,8 @@
 
 Experimental Language is a language created just to test some concepts.
 
-Use
----
+Usage
+-----
 
 ./exprc-language myprogram.exprc
 

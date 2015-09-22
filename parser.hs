@@ -7,7 +7,7 @@ spaces :: Parser ()
 spaces = Parsec.skipMany1 Parsec.space
 
 parseOp :: Parser Char
-parseOp = Parsec.oneOf "+-*/"
+parseOp = Parsec.oneOf "+-*/&|"
 
 parseNum :: Parser ExprC
 parseNum = do
