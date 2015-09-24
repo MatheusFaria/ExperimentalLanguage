@@ -11,7 +11,8 @@ op := + - * / | &
 -}
 module DataDefinitions(
                 ExprC(NumC, TrueC, FalseC, BinOpC, IfC, FunC),
-                ExprV(NumV, BoolV)) where
+                ExprV(NumV, BoolV, CloV),
+                Binding(Bind)) where
 
 data ExprC =   NumC Float
              | TrueC
@@ -23,6 +24,8 @@ data ExprC =   NumC Float
 
 data ExprV =   NumV Float
              | BoolV Bool
-             | ClosV [String] ExprC
+             | CloV [String] ExprC [Binding] 
              deriving (Show, Eq)
 
+data Binding =  Bind String ExprV
+                deriving (Show, Eq)

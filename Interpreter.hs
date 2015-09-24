@@ -49,11 +49,12 @@ getBinop op
 -- ################### Evaluator ################
 
 -- Evaluates an Expression
-interp :: ExprC -> ExprV
-interp (NumC n) = (NumV n)
-interp (TrueC) = (BoolV True)
-interp (FalseC) = (BoolV False)
-interp (BinOpC op a b) = ((getBinop op) (interp a) (interp b))
-interp (IfC tes ifTrue ifFalse)
-        | (interp tes) == (BoolV True) = (interp ifTrue)
-        | otherwise = (interp ifFalse)
+interp :: ExprC -> [Binding] -> ExprV
+interp (NumC n) env = (NumV n)
+interp (TrueC) env = (BoolV True)
+interp (FalseC) env = (BoolV False)
+interp (BinOpC op a b) env = ((getBinop op) (interp a env) (interp b env))
+interp (IfC tes ifTrue ifFalse) env
+        | (interp tes env) == (BoolV True) = (interp ifTrue env)
+        | otherwise = (interp ifFalse env)
+interp (FunC args body) env = (CloV args body env)
