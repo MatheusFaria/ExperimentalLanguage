@@ -57,4 +57,5 @@ interp (BinOpC op a b) env = ((getBinop op) (interp a env) (interp b env))
 interp (IfC tes ifTrue ifFalse) env
         | (interp tes env) == (BoolV True) = (interp ifTrue env)
         | otherwise = (interp ifFalse env)
-interp (FunC args body) env = (CloV args body env)
+interp (LamC args body) env = (CloV args body env)
+interp (CallC fn args) env = (let fd = (interp fn env) in (interp (f fd) (e fd)))

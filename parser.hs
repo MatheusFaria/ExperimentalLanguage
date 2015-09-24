@@ -50,7 +50,15 @@ parseFunction = do
     Parsec.oneOf ")"
     body <- spaces >> parseAll
     spaces >> Parsec.oneOf ")"
-    return (FunC [] body)
+    return (LamC [] body)
+
+parseCall :: Parser ExprC
+parseCall = do
+    Parsec.oneOf "("
+    f <- parseFunction
+    spaces >> Parsec.oneOf ")"
+    return (CallC f [])
+
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
@@ -59,6 +67,7 @@ parseAll = try parseNum
         <|> try parseBinop
         <|> try parseIf
         <|> try parseFunction
+        <|> try parseCall
 
 
 mainParse :: String -> ExprC
