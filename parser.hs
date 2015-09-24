@@ -5,8 +5,8 @@ import Text.ParserCombinators.Parsec
 import DataDefinitions
 
 
-parseOp :: Parser Char
-parseOp = Parsec.oneOf "+-*/&|"
+parseOp :: Parser String
+parseOp = choice (map string ["-", "+", "/", "*", "&", "|"])
 
 parseNum :: Parser ExprC
 parseNum = do

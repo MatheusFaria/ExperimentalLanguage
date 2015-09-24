@@ -17,10 +17,12 @@ data ExprC =   NumC Float
              | TrueC
              | FalseC
              | IfC ExprC ExprC ExprC
-             | BinOpC Char ExprC ExprC
+             | BinOpC String ExprC ExprC
+             | LamC [String] ExprC
              deriving (Show, Eq)
 
 data ExprV =   NumV Float
              | BoolV Bool
+             | ClosV [String] ExprC
              deriving (Show, Eq)
 

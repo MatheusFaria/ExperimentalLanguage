@@ -6,8 +6,8 @@ import DataDefinitions
 -- ############ Binary Operations #############
 
 -- Maps the binary operation symbols to the actual implementation
-binops = [('+', sumC), ('-', subC), ('*', mulC), ('/', divC),
-          ('&', andC), ('|', orC)]
+binops = [("+", sumC), ("-", subC), ("*", mulC), ("/", divC),
+          ("&", andC), ("|", orC)]
 
 -- Sum two NumV and returns the resulting NumV
 sumC :: ExprV -> ExprV -> ExprV
@@ -37,9 +37,9 @@ orC (BoolV a) (BoolV b) = (BoolV (a || b))
 
 
 -- Given the symbol lookups for the binary operation in the table
-getBinop :: Char -> (ExprV -> ExprV -> ExprV)
+getBinop :: String -> (ExprV -> ExprV -> ExprV)
 getBinop op
-        | isNothing func = error ("Invalid Binary Operation " ++ (op : []))
+        | isNothing func = error ("Invalid Binary Operation " ++ op)
         | isJust func = fromJust(func)
         where func = lookup op binops
 
