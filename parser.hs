@@ -1,3 +1,5 @@
+module Parser(mainParse) where
+
 import qualified Text.Parsec as Parsec
 import Text.ParserCombinators.Parsec
 import DataDefinitions
