@@ -10,7 +10,7 @@ ExprC := number
 op := + - * / | &
 -}
 module DataDefinitions(
-                ExprC(NumC, TrueC, FalseC, BinOpC, IfC),
+                ExprC(NumC, TrueC, FalseC, BinOpC, IfC, FunC),
                 ExprV(NumV, BoolV)) where
 
 data ExprC =   NumC Float

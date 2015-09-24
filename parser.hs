@@ -42,12 +42,23 @@ parseIf = do
     spaces >> Parsec.oneOf ")"
     return (IfC cond ifTrue ifFalse)
 
+parseFunction :: Parser ExprC
+parseFunction = do
+    Parsec.oneOf "(" >> spaces
+    Parsec.string "fn" >> spaces
+    Parsec.oneOf "(" >> spaces
+    Parsec.oneOf ")"
+    body <- spaces >> parseAll
+    spaces >> Parsec.oneOf ")"
+    return (FunC [] body)
+
 parseAll :: Parser ExprC
 parseAll = try parseNum
         <|> parseTrue
         <|> parseFalse
         <|> try parseBinop
         <|> try parseIf
+        <|> try parseFunction
 
 
 mainParse :: String -> ExprC
