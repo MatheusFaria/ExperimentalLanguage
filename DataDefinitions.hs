@@ -3,30 +3,37 @@
 ExprC := number
         | true
         | false
+        | id
         | (if ExprC ExprC ExprC)
-        | (op ExprC ExprC)
+        | (ExprC op ExprC)
+        | (fn (id ..) ExprC)
+        | (ExprC [ExprC ..])
 
 
 op := + - * / | &
 -}
 module DataDefinitions(
-                ExprC(NumC, TrueC, FalseC, BinOpC, IfC, LamC, CallC),
+                ExprC(..),
                 ExprV(..),
-                Binding(Bind)) where
+                Binding(..),
+                Environment) where
 
 data ExprC =   NumC Float
              | TrueC
              | FalseC
+             | IdC String
              | IfC ExprC ExprC ExprC
              | BinOpC String ExprC ExprC
              | LamC [String] ExprC
              | CallC ExprC [ExprC]
              deriving (Show, Eq)
 
-data ExprV =   NumV Float
-             | BoolV Bool
-             | CloV { params :: [String], f :: ExprC, e :: [Binding] }
+data ExprV =   NumV {num :: Float}
+             | BoolV {bool :: Bool}
+             | CloV { params :: [String], fn :: ExprC, environment :: Environment }
              deriving (Show, Eq)
 
-data Binding =  Bind String ExprV
+data Binding =  Bind {identifier :: String, value :: ExprV}
                 deriving (Show, Eq)
+
+type Environment = [Binding]

@@ -23,6 +23,14 @@ parseFalse = do
     Parsec.string "false"
     return (FalseC)
 
+idSeparator = spaces
+idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|()=, "])
+
+parseId :: Parser ExprC
+parseId = do
+        identifier <- idPattern
+        return (IdC identifier)
+
 parseBinop :: Parser ExprC
 parseBinop = do
     Parsec.oneOf "(" >> spaces
@@ -47,23 +55,26 @@ parseFunction = do
     Parsec.oneOf "(" >> spaces
     Parsec.string "fn" >> spaces
     Parsec.oneOf "(" >> spaces
-    Parsec.oneOf ")"
+    params <- sepBy idPattern idSeparator
+    spaces >> Parsec.oneOf ")"
     body <- spaces >> parseAll
     spaces >> Parsec.oneOf ")"
-    return (LamC [] body)
+    return (LamC params body)
 
 parseCall :: Parser ExprC
 parseCall = do
-    Parsec.oneOf "("
-    f <- parseFunction
+    Parsec.oneOf "(" >> spaces
+    f <- spaces >> parseAll
+    values <- spaces >> sepBy parseAll idSeparator
     spaces >> Parsec.oneOf ")"
-    return (CallC f [])
+    return (CallC f values)
 
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
         <|> parseTrue
         <|> parseFalse
+        <|> try parseId
         <|> try parseBinop
         <|> try parseIf
         <|> try parseFunction

@@ -44,18 +44,35 @@ getBinop op
         where func = lookup op binops
 
 
+-- ################# Environment Operations #################
+
+-- looks for a identifier inside a environment
+lookup_in_env :: String -> Environment -> ExprV
+lookup_in_env x (h:t)
+        | x == (identifier h) = (value h)
+        | null t = error("Id [" ++ x ++ "] out of scope")
+        | otherwise = lookup_in_env x t
+
+
+-- Add to a environment all the bindings related to a funciton call
+generate_function_env :: [String] -> [ExprV] -> Environment -> Environment
+generate_function_env params values env
+        | length params /= length values = error "Wrong number of parameters on function call"
+        | null params = env
+        | otherwise = (Bind (head params) (head values)) : (generate_function_env (tail params) (tail values) env)
 
 
 -- ################### Evaluator ################
 
 -- Evaluates an Expression
-interp :: ExprC -> [Binding] -> ExprV
+interp :: ExprC -> Environment -> ExprV
 interp (NumC n) env = (NumV n)
 interp (TrueC) env = (BoolV True)
 interp (FalseC) env = (BoolV False)
+interp (IdC x) env = lookup_in_env x env
 interp (BinOpC op a b) env = ((getBinop op) (interp a env) (interp b env))
 interp (IfC tes ifTrue ifFalse) env
         | (interp tes env) == (BoolV True) = (interp ifTrue env)
         | otherwise = (interp ifFalse env)
 interp (LamC args body) env = (CloV args body env)
-interp (CallC fn args) env = (let fd = (interp fn env) in (interp (f fd) (e fd)))
+interp (CallC func args)  env = (let fd = (interp func env) in (interp (fn fd) ((generate_function_env (params fd) (map (\x -> (interp x env)) args) env) ++ (environment fd))))
