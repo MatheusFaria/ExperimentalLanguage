@@ -24,6 +24,7 @@ parseFalse = do
     return (FalseC)
 
 idSeparator = spaces
+
 idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|()=, "])
 
 parseId :: Parser ExprC
@@ -69,6 +70,27 @@ parseCall = do
     spaces >> Parsec.oneOf ")"
     return (CallC f values)
 
+parseWhereAttr :: Parsec.Parsec String () (String,String)
+parseWhereAttr = do
+    Parsec.oneOf "(" >> spaces
+    id <- idPattern
+    spaces >> Parsec.char '=' >> spaces
+    value <- many1 Parsec.anyChar
+    spaces >> Parsec.oneOf ")"
+    return (id, value)
+
+parseWhereAttrs :: Parsec.Parsec String () [(String,String)]
+parseWhereAttrs = Parsec.sepBy parseWhereAttr (Parsec.char ',')
+
+parseWhere :: Parser ExprC
+parseWhere = do
+    Parsec.oneOf "(" >> spaces
+    Parsec.string "where" >> spaces
+    attrs <- parseWhereAttrs
+    body <- spaces >> many1 Parsec.anyChar
+    spaces >> Parsec.oneOf ")"
+    return (mainParse ("((fn (" ++ (foldr (++) [] (map fst attrs)) ++ ") " ++ body ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
+
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
@@ -84,4 +106,4 @@ parseAll = try parseNum
 mainParse :: String -> ExprC
 mainParse input = case (Parsec.parse parseAll "[source code]" input) of
     Right expr -> expr
-    Left err -> error "Invalid Syntax"
+    Left err -> error ("Invalid Syntax: " ++ input)
