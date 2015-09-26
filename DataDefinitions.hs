@@ -6,8 +6,9 @@ ExprC := number
         | id
         | (if ExprC ExprC ExprC)
         | (ExprC op ExprC)
-        | (fn (id ..) ExprC)
-        | (ExprC [ExprC ..])
+        | (fn (id ...) ExprC)
+        | (ExprC [ExprC ...])
+        | (where (id = ExprC) ... ExprC)
 
 
 op := + - * / | &
