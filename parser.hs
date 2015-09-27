@@ -56,10 +56,10 @@ expjoin (ExpressionList s) = "( " ++ (foldr (++) [] (map expjoin s)) ++ ")"
 idSeparator = spaces
 
 idPattern :: Parser String
-idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|()=, "])
+idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|()=, \""])
 
 opPattern :: Parser String
-opPattern = choice (map string ["-", "+", "/", "*", "&", "|"])
+opPattern = choice (map string availableBinops)
 
 
 -- ############### Parsers ####################
@@ -86,12 +86,19 @@ parseFalse = do
     return (FalseC)
 
 
-
 -- Parse a String to IdC
 parseId :: Parser ExprC
 parseId = do
         identifier <- idPattern
         return (IdC identifier)
+
+
+-- Parse a String to StringC
+parseString :: Parser ExprC
+parseString = do
+        char '\"'
+        str <- manyTill anyChar (char '\"')
+        return (StringC str)
 
 
 -- Parse a String to BinOpC
@@ -173,6 +180,7 @@ parseAll = try parseNum
         <|> parseTrue
         <|> parseFalse
         <|> try parseId
+        <|> try parseString
         <|> try parseBinop
         <|> try parseIf
         <|> try parseFunction

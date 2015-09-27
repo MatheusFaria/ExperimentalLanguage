@@ -9,13 +9,15 @@ Syntax
             | true
             | false
             | id
+            | string
             | (if ExprC ExprC ExprC)
             | (ExprC op ExprC)
-            | (fn (id ..) ExprC)
-            | (ExprC [ExprC ..])
+            | (fn (id ...) ExprC)
+            | (ExprC [ExprC ...])
+            | (where (id = ExprC) ... ExprC)
 
 
-    op := + - * / | &
+    op := + - * / and or ==
 
 Usage
 -----

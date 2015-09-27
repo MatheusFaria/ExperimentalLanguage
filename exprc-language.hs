@@ -33,3 +33,5 @@ prettyPrintEval (CloV _ _ _) = "function"
 prettyPrintEval (BoolV t)
         | t = "true"
         | otherwise = "false"
+
+prettyPrintEval (StringV t) = t

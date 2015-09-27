@@ -7,33 +7,47 @@ import DataDefinitions
 
 -- Maps the binary operation symbols to the actual implementation
 binops = [("+", sumC), ("-", subC), ("*", mulC), ("/", divC),
-          ("&", andC), ("|", orC)]
+          ("and", andC), ("or", orC), ("==", eqC)]
 
 -- Sum two NumV and returns the resulting NumV
 sumC :: ExprV -> ExprV -> ExprV
 sumC (NumV a) (NumV b) = (NumV (a + b))
+sumC (StringV a) (StringV b) = (StringV (a ++ b))
+sumC _ _ = error "Operation + not define for this data type"
 
 -- Subtracts two NumV and returns the resulting NumV
 subC :: ExprV -> ExprV -> ExprV
 subC (NumV a) (NumV b) = (NumV (a - b))
+subC _ _ = error "Operation - not define for this data type"
 
 -- Multiply two NumV and returns the resulting NumV
 mulC :: ExprV -> ExprV -> ExprV
 mulC (NumV a) (NumV b) = (NumV (a * b))
+mulC _ _ = error "Operation * not define for this data type"
 
 -- Divides two NumV and returns the resulting NumV
 divC :: ExprV -> ExprV -> ExprV
 divC (NumV a) (NumV b)
         | b == 0 = error "Division by zero"
         | otherwise = (NumV (a / b))
+divC _ _ = error "Operation / not define for this data type"
 
 -- Does the logic operation AND
 andC :: ExprV -> ExprV -> ExprV
 andC (BoolV a) (BoolV b) = (BoolV (a && b))
+andC _ _ = error "Operation 'and' not define for this data type"
 
 -- Does the logic operation OR
 orC :: ExprV -> ExprV -> ExprV
 orC (BoolV a) (BoolV b) = (BoolV (a || b))
+orC _ _ = error "Operation 'or' not define for this data type"
+
+-- Does the logic operation ==
+eqC :: ExprV -> ExprV -> ExprV
+eqC (NumV a)    (NumV b)    = (BoolV (a == b))
+eqC (BoolV a)   (BoolV b)   = (BoolV (a == b))
+eqC (StringV a) (StringV b) = (BoolV (a == b))
+eqC _ _ = BoolV False
 
 
 -- Given the symbol lookups for the binary operation in the table
@@ -69,6 +83,7 @@ interp :: ExprC -> Environment -> ExprV
 interp (NumC n) env = (NumV n)
 interp (TrueC) env = (BoolV True)
 interp (FalseC) env = (BoolV False)
+interp (StringC s) env = (StringV s)
 interp (IdC x) env = lookup_in_env x env
 interp (BinOpC op a b) env = ((getBinop op) (interp a env) (interp b env))
 interp (IfC tes ifTrue ifFalse) env

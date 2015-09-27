@@ -4,6 +4,7 @@ ExprC := number
         | true
         | false
         | id
+        | string
         | (if ExprC ExprC ExprC)
         | (ExprC op ExprC)
         | (fn (id ...) ExprC)
@@ -11,17 +12,20 @@ ExprC := number
         | (where (id = ExprC) ... ExprC)
 
 
-op := + - * / | &
+op := + - * / and or ==
 -}
 module DataDefinitions(
                 ExprC(..),
                 ExprV(..),
                 Binding(..),
-                Environment) where
+                Environment,
+                availableBinops,
+                ) where
 
 data ExprC =   NumC Float
              | TrueC
              | FalseC
+             | StringC String
              | IdC String
              | IfC ExprC ExprC ExprC
              | BinOpC String ExprC ExprC
@@ -31,6 +35,7 @@ data ExprC =   NumC Float
 
 data ExprV =   NumV {num :: Float}
              | BoolV {bool :: Bool}
+             | StringV {str :: String}
              | CloV { params :: [String], fn :: ExprC, environment :: Environment }
              deriving (Show, Eq)
 
@@ -38,3 +43,6 @@ data Binding =  Bind {identifier :: String, value :: ExprV}
                 deriving (Show, Eq)
 
 type Environment = [Binding]
+
+
+availableBinops = ["+", "-", "*", "/", "and", "or", "=="]
