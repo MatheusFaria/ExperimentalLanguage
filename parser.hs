@@ -22,13 +22,13 @@ emptyExpr = do
 
 elementExpr :: Parser Expression
 elementExpr = do
-        element <- many1 (satisfy (\x -> not(isSpace(x)) && x /= '(' && x /= ')'))
+        element <- many1 (satisfy (\x -> not(isSpace(x)) && x /= '(' && x /= ')' && x /= ','))
         return (ExpressionElement element)
 
 enclosedExpr :: Parser Expression
 enclosedExpr = do
     char '(' >> spaces
-    element <- sepEndBy preParseRule (char ' ')
+    element <- sepEndBy preParseRule (many1 (oneOf " ,"))
     spaces >> char ')'
     return (ExpressionList element)
 
@@ -130,7 +130,7 @@ parseFunction = do
     Parsec.oneOf "(" >> spaces
     Parsec.string "fn" >> spaces
     Parsec.oneOf "(" >> spaces
-    params <- sepBy idPattern idSeparator
+    params <- sepEndBy idPattern idSeparator
     spaces >> Parsec.oneOf ")"
     body <- spaces >> parseAll
     spaces >> Parsec.oneOf ")"
@@ -150,24 +150,26 @@ parseCall = do
 -- Parse a string to a desugared where
 parseWhereAttr :: Parsec.Parsec String () (String,String)
 parseWhereAttr = do
-    Parsec.oneOf "(" >> spaces
+    spaces
     id <- idPattern
     spaces >> Parsec.char '=' >> spaces
     value <- preParseRule
-    spaces >> Parsec.oneOf ")"
+    spaces
     return (id, expjoin(value))
 
 parseWhereAttrs :: Parsec.Parsec String () [(String,String)]
-parseWhereAttrs = Parsec.sepBy parseWhereAttr (Parsec.char ',')
+parseWhereAttrs = Parsec.sepEndBy parseWhereAttr (Parsec.char ',')
 
 parseWhere :: Parser ExprC
 parseWhere = do
     Parsec.oneOf "(" >> spaces
     Parsec.string "where" >> spaces
+    Parsec.oneOf "(" >> spaces
     attrs <- parseWhereAttrs
+    spaces >> Parsec.oneOf ")"
     body <- spaces >> preParseRule
     spaces >> Parsec.oneOf ")"
-    return (mainParse ("((fn (" ++ (foldr (++) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
+    return (mainParse ("((fn (" ++ (foldr (\x y -> x ++ " " ++ y) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
 
 
 
