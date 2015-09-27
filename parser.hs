@@ -4,6 +4,7 @@ import qualified Text.Parsec as Parsec
 import Text.ParserCombinators.Parsec
 import DataDefinitions
 import Data.Char
+import Data.List
 
 -- ############## Parse Data Structure #############
 
@@ -172,6 +173,17 @@ parseWhere = do
     return (mainParse ("((fn (" ++ (foldr (\x y -> x ++ " " ++ y) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
 
 
+parseNamedFunction :: Parser String
+parseNamedFunction = do
+    Parsec.oneOf "(" >> spaces
+    Parsec.string "def" >> Parsec.many1 space
+    name <- idPattern
+    spaces >> Parsec.oneOf "(" >> spaces
+    params <- sepEndBy idPattern idSeparator
+    spaces >> Parsec.oneOf ")" >> spaces
+    body <- preParseRule
+    spaces >> Parsec.oneOf ")" >> spaces
+    return ("(where (" ++ name ++ "= (fn (" ++ (intercalate " " params) ++ ") " ++ expjoin(body) ++ ")) " ++ name ++ ")")
 
 
 -- ############## Main Parse ###################
@@ -186,6 +198,7 @@ parseAll = try parseNum
         <|> try parseBinop
         <|> try parseIf
         <|> try parseFunction
+        -- <|> try parseNamedFunction
         <|> try parseCall
         <|> try parseWhere
 

@@ -8,6 +8,7 @@ ExprC := number
         | (if ExprC ExprC ExprC)
         | (ExprC op ExprC)
         | (fn (id ...) ExprC)
+        | (def id (id ...) ExprC)
         | (ExprC [ExprC ...])
         | (where (id = ExprC, ...) ExprC)
 
