@@ -173,7 +173,7 @@ parseWhere = do
     return (mainParse ("((fn (" ++ (foldr (\x y -> x ++ " " ++ y) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
 
 
-parseNamedFunction :: Parser String
+parseNamedFunction :: Parser ExprC
 parseNamedFunction = do
     Parsec.oneOf "(" >> spaces
     Parsec.string "def" >> Parsec.many1 space
@@ -183,7 +183,7 @@ parseNamedFunction = do
     spaces >> Parsec.oneOf ")" >> spaces
     body <- preParseRule
     spaces >> Parsec.oneOf ")" >> spaces
-    return ("(where (" ++ name ++ "= (fn (" ++ (intercalate " " params) ++ ") " ++ expjoin(body) ++ ")) " ++ name ++ ")")
+    return (mainParse ("(where (" ++ name ++ "= (fn (" ++ (intercalate " " params) ++ ") " ++ expjoin(body) ++ ")) " ++ name ++ ")"))
 
 
 -- ############## Main Parse ###################
@@ -191,14 +191,14 @@ parseNamedFunction = do
 
 parseAll :: Parser ExprC
 parseAll = try parseNum
-        <|> parseTrue
-        <|> parseFalse
+        <|> try parseTrue
+        <|> try parseFalse
         <|> try parseId
         <|> try parseString
         <|> try parseBinop
         <|> try parseIf
         <|> try parseFunction
-        -- <|> try parseNamedFunction
+        <|> try parseNamedFunction
         <|> try parseCall
         <|> try parseWhere
 
