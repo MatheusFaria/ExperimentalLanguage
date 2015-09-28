@@ -46,4 +46,4 @@ data Binding =  Bind {identifier :: String, value :: ExprV}
 type Environment = [Binding]
 
 
-availableBinops = ["+", "-", "*", "/", "and", "or", "=="]
+availableBinops = ["+", "-", "*", "/", "and", "or", "==", "<"]

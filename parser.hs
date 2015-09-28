@@ -29,7 +29,7 @@ elementExpr = do
 enclosedExpr :: Parser Expression
 enclosedExpr = do
     char '(' >> spaces
-    element <- sepEndBy preParseRule (many1 (oneOf " ,"))
+    element <- sepEndBy preParseRule (many (oneOf " ,"))
     spaces >> char ')'
     return (ExpressionList element)
 
@@ -42,13 +42,13 @@ preParseRule = try enclosedExpr
 preParse :: String -> Expression
 preParse input = case (Parsec.parse preParseRule "[source code]" input) of
     Right expr -> expr
-    Left err -> error ("Invalid Syntax: " ++ input)
+    Left err -> error ("PerParse Invalid Syntax: " ++ input)
 
 
 expjoin :: Expression -> String
 expjoin EmptyExpression = ""
 expjoin (ExpressionElement s) = s ++ " "
-expjoin (ExpressionList s) = "( " ++ (foldr (++) [] (map expjoin s)) ++ ")"
+expjoin (ExpressionList s) = " ( " ++ (foldr (++) [] (map expjoin s)) ++ " ) "
 
 
 -- ############### Patterns ####################
@@ -57,7 +57,7 @@ expjoin (ExpressionList s) = "( " ++ (foldr (++) [] (map expjoin s)) ++ ")"
 idSeparator = spaces
 
 idPattern :: Parser String
-idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|()=, \""])
+idPattern = many1 (Parsec.choice [letter, digit, noneOf "+-*/&|<()=, \""])
 
 opPattern :: Parser String
 opPattern = choice (map string availableBinops)
@@ -170,7 +170,7 @@ parseWhere = do
     spaces >> Parsec.oneOf ")"
     body <- spaces >> preParseRule
     spaces >> Parsec.oneOf ")"
-    return (mainParse ("((fn (" ++ (foldr (\x y -> x ++ " " ++ y) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ")" ++ (foldr (++) [] (map snd attrs)) ++ ")"))
+    return (mainParse ("((fn (" ++ (foldr (\x y -> x ++ " " ++ y) [] (map fst attrs)) ++ ") " ++ expjoin(body) ++ ") " ++ (foldr (++) [] (map snd attrs)) ++ ")"))
 
 
 parseNamedFunction :: Parser ExprC

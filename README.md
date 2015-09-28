@@ -17,7 +17,7 @@ Syntax
             | (where (id = ExprC, ...) ExprC)
 
 
-    op := + - * / and or ==
+    op := + - * / and or == <
 
 Usage
 -----

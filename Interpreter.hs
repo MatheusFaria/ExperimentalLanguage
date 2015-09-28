@@ -7,7 +7,7 @@ import DataDefinitions
 
 -- Maps the binary operation symbols to the actual implementation
 binops = [("+", sumC), ("-", subC), ("*", mulC), ("/", divC),
-          ("and", andC), ("or", orC), ("==", eqC)]
+          ("and", andC), ("or", orC), ("==", eqC), ("<", lessC)]
 
 -- Sum two NumV and returns the resulting NumV
 sumC :: ExprV -> ExprV -> ExprV
@@ -49,6 +49,10 @@ eqC (BoolV a)   (BoolV b)   = (BoolV (a == b))
 eqC (StringV a) (StringV b) = (BoolV (a == b))
 eqC _ _ = BoolV False
 
+-- Does the logic operation <
+lessC :: ExprV -> ExprV -> ExprV
+lessC (NumV a) (NumV b)  = (BoolV (a < b))
+lessC _ _ = error "Operation '<' not define for this data type"
 
 -- Given the symbol lookups for the binary operation in the table
 getBinop :: String -> (ExprV -> ExprV -> ExprV)

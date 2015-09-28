@@ -1,0 +1,9 @@
+(where (mod = (fn (a b) (if (a < b) a (mod (a - b) b))))
+        (where (foobar = (fn (n)
+                             (if (((mod n 3) == 0) and ((mod n 5) == 0))
+                                "foobar"
+                                 (if ((mod n 3) == 0)
+                                        "foo"
+                                        (if ((mod n 5) == 0)
+                                            "bar"
+                                             n))))) (foobar 15)))
