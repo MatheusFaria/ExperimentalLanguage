@@ -31,6 +31,7 @@ data ExprC =   NumC Float
              | IfC ExprC ExprC ExprC
              | BinOpC String ExprC ExprC
              | LamC [String] ExprC
+             | RecC String [String] ExprC
              | CallC ExprC [ExprC]
              deriving (Show, Eq)
 

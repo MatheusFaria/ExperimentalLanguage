@@ -181,9 +181,9 @@ parseNamedFunction = do
     spaces >> Parsec.oneOf "(" >> spaces
     params <- sepEndBy idPattern idSeparator
     spaces >> Parsec.oneOf ")" >> spaces
-    body <- preParseRule
+    body <- parseAll
     spaces >> Parsec.oneOf ")" >> spaces
-    return (mainParse ("(where (" ++ name ++ "= (fn (" ++ (intercalate " " params) ++ ") " ++ expjoin(body) ++ ")) " ++ name ++ ")"))
+    return (RecC name params body)
 
 
 -- ############## Main Parse ###################

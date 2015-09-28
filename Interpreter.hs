@@ -94,4 +94,5 @@ interp (IfC tes ifTrue ifFalse) env
         | (interp tes env) == (BoolV True) = (interp ifTrue env)
         | otherwise = (interp ifFalse env)
 interp (LamC args body) env = (CloV args body env)
+interp (RecC name args body) env = (CloV args body ((Bind name (CloV args body env)) : env))
 interp (CallC func args)  env = (let fd = (interp func env) in (interp (fn fd) ((generate_function_env (params fd) (map (\x -> (interp x env)) args) env) ++ (environment fd))))
